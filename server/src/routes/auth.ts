@@ -72,4 +72,9 @@ router.get("/me", authMiddleware, (req, res) => {
   res.json({ userId: req.userId });
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({ message: "Logout realizado" });
+});
+
 export default router;
