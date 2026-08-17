@@ -5,8 +5,8 @@ import { Prisma } from "../generated/prisma/client.js";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "../middleware/auth.js";
 
-
 const router = Router();
+const isProd = process.env.NODE_ENV === "production";
 
 router.post("/register", async (req, res) => {
   try {
@@ -57,8 +57,8 @@ router.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProd,
+      sameSite: isProd ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -73,7 +73,11 @@ router.get("/me", authMiddleware, (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "strict",
+  });
   res.json({ message: "Logout realizado" });
 });
 
